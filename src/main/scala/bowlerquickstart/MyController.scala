@@ -3,6 +3,7 @@ package bowlerquickstart
 import org.bowlerframework.controller.{Controller,FunctionNameConventionRoutes}
 import org.bowlerframework.model.{ ParameterMapper, Validations}
 import org.bowlerframework.view.{Renderable}
+import java.io.File
 
 /**
  * 
@@ -21,4 +22,19 @@ class MyController extends Controller with ParameterMapper with Validations with
 // in this case /views/GET/index. The ending of the template file (mustache, ssp, jade or scaml) will be auto-resolved in the order mentioned here.
 // for named params, the ":" of the Scalatra route definition will be replaced by "_" when looking up on the classpath.
   def `GET /` = render
+  
+  def `POST /`(file:Test) = {
+    val filename = file.filename
+    render(new Status("file exists on filesystem %s".format(new File(filename).exists())))
+  }
+}
+
+case class Status(val status:String)
+
+case class Test(val file:List[String]){
+  val StoreLocation = """.*StoreLocation=([^\,]*)\,.*""".r
+  def filename = file.head match {
+	  case StoreLocation(location) => location
+	  case _ => "nothing " + file.head
+	}
 }
